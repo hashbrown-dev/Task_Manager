@@ -1,0 +1,46 @@
+<mat-form-field appearance="standard">
+    <mat-label>Filter</mat-label>
+    <input matInput (keyup)="searchTodo($event)" placeholder="Ex. Movie" #input>
+  </mat-form-field>
+  
+  <div class="custom-div-table">
+    <table
+      mat-table
+      [dataSource]="(todos$ | async) || []"
+      class="mat-elevation-z8">
+  
+      <!-- ID Column -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef> Name </th>
+        <td mat-cell *matCellDef="let row"> {{row.name}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef> Des </th>
+        <td mat-cell *matCellDef="let row"> {{row.description}} </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  
+      <!-- Row shown when there is no matching data. -->
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" colspan="4">No data matching the filter "{{input.value}}"</td>
+      </tr>
+    </table>
+  
+    <!-- <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of users"></mat-paginator> -->
+    <mat-paginator
+    #paginator
+    [pageSizeOptions]="pageSizesOptions"
+    [pageSize]="5"
+    [length]="resultsLength"
+    (page)="paginationBehaviorObject$.next({
+      take: $event.pageSize,
+      skip: $event.pageIndex * $event.pageSize,
+      search: this.paginationParameters.search,
+      status: this.paginationParameters.status
+    })"
+    aria-label="Show items">
+  </mat-paginator>
+  </div>

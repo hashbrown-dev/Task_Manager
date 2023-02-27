@@ -1,0 +1,287 @@
+<div class="Container">
+
+  <div id="searchBar">
+    <div class="col-sm">
+      <mat-form-field appearance="standard">
+        <mat-label>Search Task</mat-label>
+        <input
+          type="text"
+          matInput
+          (keyup)="searchTodo($event)"
+          placeholder="Ex. Movie"
+          #searchTodoInput
+        />
+      </mat-form-field>
+    </div>
+
+    <section class="example-section">
+      <mat-slide-toggle
+          class="custom-toggle"
+          [color]="color"
+          [checked]="checked"
+          [disabled]="disabled"
+          (change)="onToggleChange($event.checked)">
+        Display Completed Tasks!
+      </mat-slide-toggle>
+    </section>
+  </div>
+
+  <div id="pendingTodoDiv">
+    
+    <div id="tableLoadingSpinner" 
+      class="loading-shade"
+      *ngIf="isLoadingResultsPD">
+      <mat-spinner *ngIf="isLoadingResultsPD"></mat-spinner>
+    </div>
+
+    <div id="tableTopBar" class="mat-header-row">
+      
+      <div class="col-sm">
+        <h2 class="mb-0 table-heading">Pending Tasks</h2>
+      </div>
+
+      <div class="col-sm">
+        <mat-paginator
+        [pageSizeOptions]="pageSizesOptions"
+        [pageSize]="5 || paginationParametersPD.take"
+        [length]="resultsLengthPD"
+        (page)="
+        paginationBehaviorObjectPD$.next({
+            take: $event.pageSize,
+            skip: $event.pageIndex * $event.pageSize,
+            search: this.paginationParametersPD.search,
+            status: this.paginationParametersPD.status
+          })"
+        showFirstLastButtons
+        aria-label="Show items">
+      </mat-paginator>
+      </div>
+
+      <!-- <mat-slide-toggle [(ngModel)]="checked" (change)="changed()"
+        >Show completed</mat-slide-toggle> -->
+
+    </div>
+
+    <div class="pendingTodoTableDiv">
+      <table
+        mat-table
+        [dataSource]="(todosPending$ | async) || []"
+        class="mat-elevation-z8 styled-table"
+      >
+        <ng-container matColumnDef="id">
+          <th mat-header-cell class="custom-mat-header-cell" *matHeaderCellDef>
+            <span>
+              <mat-icon class="material-symbols-outlined"
+                >check_circle</mat-icon
+              >
+            </span>
+          </th>
+          <td mat-cell *matCellDef="let todo">
+            <mat-checkbox
+              (change)="markAsDone(todo.id)"
+              matTooltip="Mark as Compelte!"
+            ></mat-checkbox>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+          <th mat-header-cell class="custom-mat-header-cell" *matHeaderCellDef>
+            {{ "Name" | uppercase }}
+          </th>
+          <td mat-cell *matCellDef="let todo">{{ todo.name }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="due_date">
+          <th mat-header-cell class="custom-mat-header-cell" *matHeaderCellDef>
+            {{ "Due Date" | uppercase }}
+          </th>
+          <td mat-cell *matCellDef="let todo" class="w3-deep-orange">
+            {{ todo.due_date | date }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="priority">
+          <th mat-header-cell class="custom-mat-header-cell" *matHeaderCellDef>
+            {{ "Priority" | uppercase }}
+          </th>
+          <td mat-cell *matCellDef="let todo" [ngSwitch]="todo.priority">
+            <mat-icon
+              *ngSwitchCase="'Low'"
+              class="lowP"
+              matTooltip="Low Priority"
+              >beenhere</mat-icon
+            >
+            <mat-icon
+              *ngSwitchCase="'Medium'"
+              class="medP"
+              matTooltip="Medium Priority"
+              >beenhere</mat-icon
+            >
+            <!-- <img *ngSwitchCase="'Medium'" mat-card-sm-image src="../../../../../../apps/web-client/src/assets/priorityImg/img24.png" > -->
+            <mat-icon
+              *ngSwitchCase="'High'"
+              class="highP"
+              matTooltip="High Priority"
+              >beenhere</mat-icon
+            >
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="detais">
+          <th mat-header-cell class="custom-mat-header-cell" *matHeaderCellDef>
+            {{ "Manage" | uppercase }}
+          </th>
+          <td mat-cell *matCellDef="let todo">
+            <span>
+              <mat-icon
+                class="material-symbols-outlined editAction"
+                (click)="updateTaskDialog(todo)"
+                matTooltip="Update ToDo"
+                >edit_note</mat-icon
+              >
+            </span>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <span>
+              <mat-icon
+                class="material-symbols-outlined deleteAction"
+                (click)="deleteTask(todo.id)"
+                matTooltip="Delete ToDo"
+                >delete_forever</mat-icon
+              >
+            </span>
+          </td>
+        </ng-container>
+
+        <tr
+          mat-header-row
+          *matHeaderRowDef="displayedPendingColumns"
+          ngClass="even"
+        ></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedPendingColumns"></tr>
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" colspan="4">Sorry! No matching records found with -  "{{searchTodoInput.value}}"</td>
+        </tr>
+      </table>      
+    </div>
+
+  </div>
+
+
+  <div id="completedTodoDiv" *ngIf="isTableVisible">
+    
+    <hr class="hr-1">
+    
+    <div id="tableLoadingSpinner" 
+      class="loading-shade"
+      *ngIf="isLoadingResultsCM">
+      <mat-spinner *ngIf="isLoadingResultsCM"></mat-spinner>
+    </div>
+
+    <div id="tableTopBar" class="mat-header-row">
+      
+      <div class="col-sm">
+        <h2 class="mb-0 table-heading">Completed Tasks</h2>
+      </div>
+
+      <div class="col-sm">
+        <mat-paginator
+        [pageSizeOptions]="pageSizesOptions"
+        [pageSize]="5 || paginationParametersCM.take"
+        [length]="resultsLengthCM"
+        (page)="
+        paginationBehaviorObjectCM$.next({
+            take: $event.pageSize,
+            skip: $event.pageIndex * $event.pageSize,
+            search: this.paginationParametersCM.search,
+            status: this.paginationParametersCM.status
+          })"
+        showFirstLastButtons
+        aria-label="Show items">
+      </mat-paginator>
+      </div>
+
+      <!-- <mat-slide-toggle [(ngModel)]="checked" (change)="changed()"
+        >Show completed</mat-slide-toggle> -->
+
+    </div>
+
+    <div class="completedTodoTableDiv">
+      <table
+      mat-table
+      [dataSource]="(todosCompleted$ | async) || []"
+      class="mat-elevation-z8 styled-table"
+    >
+      <ng-container matColumnDef="name">
+        <th mat-header-cell class="custom-mat-header-cell" *matHeaderCellDef>
+          {{ "Name" | uppercase }}
+        </th>
+        <td mat-cell *matCellDef="let todo">{{ todo.name }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="priority">
+        <th mat-header-cell class="custom-mat-header-cell" *matHeaderCellDef>
+          {{ "Priority" | uppercase }}
+        </th>
+        <td mat-cell *matCellDef="let todo" [ngSwitch]="todo.priority">
+          <mat-icon *ngSwitchCase="'Low'" class="lowP" matTooltip="Low Priority"
+            >beenhere</mat-icon
+          >
+          <mat-icon
+            *ngSwitchCase="'Medium'"
+            class="medP"
+            matTooltip="Medium Priority"
+            >beenhere</mat-icon
+          >
+          <mat-icon
+            *ngSwitchCase="'High'"
+            class="highP"
+            matTooltip="High Priority"
+            >beenhere</mat-icon
+          >
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="due_date">
+        <th mat-header-cell class="custom-mat-header-cell" *matHeaderCellDef>
+          {{ "Completion Date" | uppercase }}
+        </th>
+        <td mat-cell *matCellDef="let todo" class="w3-deep-orange">
+          {{ todo.updated_date | date }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="detais">
+        <th mat-header-cell class="custom-mat-header-cell" *matHeaderCellDef>
+          {{ "Details" | uppercase }}
+        </th>
+        <td mat-cell *matCellDef="let todo">
+          <span>
+            <mat-icon
+              class="material-symbols-outlined editAction"
+              (click)="updateTaskDialog(todo)"
+              matTooltip="View ToDo Details"
+              >info</mat-icon
+            >
+          </span>
+          <!-- &nbsp;&nbsp;&nbsp;&nbsp;
+          <span>
+            <mat-icon class="material-symbols-outlined deleteAction" (click)="deleteTask(todo.id)" matTooltip="Delete ToDo">delete_forever</mat-icon>
+        </span> -->
+        </td>
+      </ng-container>
+
+      <tr
+        mat-header-row
+        *matHeaderRowDef="displayedCompletedColumns"
+        ngClass="even"
+      ></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedCompletedColumns"></tr>
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" colspan="4">Sorry! No matching records found with - "{{searchTodoInput.value}}"</td>
+      </tr>
+      </table>      
+    </div>
+
+  </div>
+
+</div>

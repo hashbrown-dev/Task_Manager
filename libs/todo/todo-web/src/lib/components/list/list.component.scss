@@ -1,0 +1,136 @@
+.completedTodoTableDiv, .pendingTodoTableDiv {
+    margin: 1em 4em 4em 4em;
+}
+
+div#completedTodoDiv {
+    padding-bottom: 1rem;
+}
+
+table {
+    width: 100%;
+    color: black;
+}
+
+.styled-table {
+    border-collapse: collapse;
+    font-size: 0.9em;
+    font-family: sans-serif;
+    min-width: 400px;
+    box-shadow: 0 0 20px black;
+}
+
+.material-symbols {
+  font-variation-settings:
+  'FILL' 1,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 48
+}
+
+.custom-mat-header-cell {
+    color: rgb(204 6 6 / 54%);
+    font-size: 15px;
+    font-weight: 600;
+}
+
+td, th {
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+tr:hover {background-color: rgb(226, 219, 219);}
+
+.lowP {
+    color: rgb(130, 186, 130);
+    // color: rgb(119, 207, 119);
+}
+
+.medP {
+    color: #4598d7;
+    // color: #98e8e6;
+    // color: #eade72;
+}
+
+.highP {
+    color: rgb(228, 83, 83);
+}
+
+.editAction {
+    color: #1377c4;
+}
+
+.deleteAction {
+ color: red;
+}
+
+// mat-checkbox-frame { 
+//     border-color: green;
+// } 
+
+.loading-shade {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 56px;
+    right: 0;
+    background: rgba(0, 0, 0, 0.15);
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  //Table Top bar in one line - Search & Paginator 
+  .one-line {
+    overflow: hidden;
+    width: 300px;
+    white-space: nowrap;
+    font-size: 0px;
+}
+
+.one-line > div {
+    display: inline-block;
+    font-size: 12pt;
+}
+
+.one-line > div:first-child {
+    background-color: yellow;
+}
+
+.one-line > div:last-child {
+    background-color: green;
+    width: 100%;
+}
+
+div#tableTopBar {
+    display: flex;
+    justify-content: space-between;
+    vertical-align: middle;
+    padding: 1rem 3rem 1rem 4rem;
+    align-items: center;
+}
+.mb-0{
+    margin-bottom: 0;
+}
+.table-heading{
+    text-shadow: 11px 20px 20px #1a1414;
+}
+div#searchBar {
+    padding-top: 5rem;
+    display: flex;
+    align-content: center;
+    justify-content: flex-end;
+    align-items: center;
+    padding-right: 4rem;
+}
+
+hr.hr-1 {
+    border: 0;
+    height: 1px;
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+    margin: 6rem 0 3rem 0;
+}
+
+.custom-toggle {
+    margin-left: 4em;
+}

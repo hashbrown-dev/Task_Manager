@@ -1,0 +1,88 @@
+<div class="container">
+    <mat-icon>edit_note</mat-icon>
+    <h2 mat-dialog-title class="add-task-custom-title">
+      Update: {{ task.name }}
+    </h2>
+    <span class="example-spacer"></span>
+    <button mat-raised-button mat-dialog-close class="custom-cancle-button">
+      Cancel
+    </button>
+  </div>
+  
+  <div mat-dialog-content>
+    <form [formGroup]="form">
+      <mat-form-field appearance="fill" floatLabel="auto">
+        <mat-label>Task Name</mat-label>
+        <input
+          matInput
+          placeholder="Provide a meaningful title"
+          required
+          formControlName="name"
+        />
+      </mat-form-field>
+  
+      <mat-form-field appearance="fill" floatLabel="auto">
+        <mat-label>Task Description</mat-label>
+        <textarea
+          matInput
+          placeholder="Write short task detail."
+          formControlName="description"
+        ></textarea>
+      </mat-form-field>
+  
+      <mat-form-field class="input-bottom-spacing-2" appearance="fill">
+        <mat-label>Due Date</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="dueDate" />
+        <mat-hint>MM/DD/YYYY</mat-hint>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+  
+      <mat-form-field>
+        <mat-label>Priority Level</mat-label>
+        <mat-select required formControlName="priority">
+          <mat-option *ngFor="let priority of priorities" [value]="priority">
+            {{priority}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+        
+        <!-- <mat-radio-group
+        class="custom-radio-group input-bottom-spacing-1">
+        <mat-radio-button
+          class="custom-radio-button"
+          *ngFor="let priority of priorities"
+          [checked]="todo.priority === priority"
+          [value]="priority"
+          formControlName="taskPriority"
+          #taskPriority>
+          {{ priority }}
+        </mat-radio-button>
+      </mat-radio-group> -->
+      <!-- <div>Your favorite season is: {{ selectedPriority }}</div> -->
+  
+      <!-- <mat-form-field class="input-bottom-spacing-2" appearance="fill">
+              <mat-checkbox (change)="markAsDone()" matTooltip="Mark as Compelte!" [checked]="todo.status===taskStatus">Complete!</mat-checkbox>
+          </mat-form-field> -->
+      <mat-checkbox
+        matTooltip="Mark as Compelte!"
+        formControlName="status">
+        Complete!
+      </mat-checkbox>
+  
+      <mat-dialog-actions class="dialog-action-alignment">
+        <button mat-raised-button color="warn" type="reset">Reset</button>
+        <span class="example-spacer"></span>
+        <button
+          mat-raised-button
+          color="primary"
+          cdkFocusInitial
+          type="submit"
+          [disabled]="form.invalid"
+          (click)="submit()">
+          Update
+        </button>
+      </mat-dialog-actions>
+    </form>
+  </div>
+  
