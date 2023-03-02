@@ -1,8 +1,9 @@
-import { Status } from "./todo.dto";
+import { Status, Priority } from "./todo.dto";
 
 export interface UpdateTodoDto {
-    title: string;
-    description: string;
-    priority: number;
-    status: Status;
+    title?: string;
+    description?: string;
+    priority?: Priority;
+    status?: Status;
+    due_date: Date | null;
 }

@@ -1,4 +1,4 @@
 export * from './Todo';
-export * from './createTodo';
+export * from './create.entity';
 export * from './paginationDTO';
 export * from './updateTodo';

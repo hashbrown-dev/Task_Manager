@@ -16,17 +16,18 @@ import { Observable } from "rxjs/internal/Observable";
 import { ActivatedRoute, Router } from "@angular/router";
 import { firstValueFrom, map } from "rxjs";
 
-import {
-  Todo,
-  PRIORITY,
-  Status,
-} from "../../../../../../apps/nest-api/src/entity/Todo";
-import { createTodo } from '../../../../../../apps/nest-api/src/entity/createTodo'
+// import {
+//   Todo,
+//   Todo.Priority,
+//   Todo.Status,
+// } from "../../../../../../apps/nest-api/src/entity/Todo";
+// import { createTodo } from '../../../../../../apps/nest-api/src/entity/createTodo'
 import { TodoWebService } from "../../services/todo-web.service";
-import {
-  UpdateTaskEntity,
-} from "apps/nest-api/src/entity/updateTodo";
-import { TodoService } from "libs/todo-api/src/lib/todo/todo.service";
+import { Todo } from "@workspace/todo-domain";
+// import {
+//   UpdateTaskEntity,
+// } from "apps/nest-api/src/entity/updateTodo";
+// import { TodoService } from "libs/todo-api/src/lib/todo/todo.service";
 
 @Component({
   selector: 'add-task-dialog',
@@ -34,43 +35,41 @@ import { TodoService } from "libs/todo-api/src/lib/todo/todo.service";
   styleUrls: ['./add-task.dialog.scss']
 })
 
-export class AddTaskDialog implements OnInit {
-  addForm: FormGroup;
-  createTodo!: Todo;
+export class AddTaskDialog {
+  createTodo!: Todo.TodoDto;
 
   constructor(
     private todoServices: TodoWebService,
-    fb: FormBuilder,
-    private ref: MatDialogRef<UpdateTaskDialogComponent>) {
-    this.addForm = fb.group({
-      name: [null, Validators.required],
-      description: [null],
-      priority: [PRIORITY.LOW, Validators.required],
-      dueDate: [new Date(), Validators.required],
-      status: [false, Validators.required],
-    });
-  }
+    private fb: FormBuilder,
+    private ref: MatDialogRef<AddTaskDialog>) {}
 
   selectedPriority!: string;
-  taskStatus = Status.COMPLETED;
-  priorities: string[] = [PRIORITY.LOW, PRIORITY.MED, PRIORITY.HIGH];
+  priorities: string[] = [Todo.Priority.LOW, Todo.Priority.MED, Todo.Priority.HIGH];
+
+  form = this.fb.group({
+    title: ['', Validators.required],
+    description: [''],
+    priority: [null],
+    due_date: [Date || null],
+    status: [null],
+  });
 
   async createNewTodo() {
-      console.log(this.addForm.value);
-      this.createTodo = new Todo();
-      this.createTodo.name = this.addForm.value.name;
-      this.createTodo.description = this.addForm.value.description;
-      this.createTodo.priority = this.addForm.value.priority;
-      this.createTodo.due_date = this.addForm.value.dueDate;
-      if(this.addForm.value.status){
-        this.createTodo.status = Status.COMPLETED;
-      }
-      else{
-        this.createTodo.status = Status.PENDING;
-      }
+      this.createTodo.title = this.form.value.title;
+      this.createTodo.description = this.form.value.description || '';
+      this.createTodo.priority = this.form.value.priority || Todo.Status.PENDING;
+      this.createTodo.due_date = this.form.value.due_date;
+      this.createTodo.status = this.form.value.status ? Todo.Status.COMPLETED : Todo.Status.PENDING;
+      // if(this.form.value.status){
+      //   this.createTodo.status = Todo.Status.COMPLETED;
+      // }
+      // else{
+      //   this.createTodo.status = Todo.Status.PENDING;
+      // }
       
       await this.todoServices.createTodo(this.createTodo);
       this.ref.close();
+      console.log('create task')
   }
 
 }

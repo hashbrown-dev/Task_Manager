@@ -112,35 +112,6 @@
       },
       "tags": []
     },
-    "todo-todo-domain": {
-      "root": "libs/todo/todo-domain",
-      "sourceRoot": "libs/todo/todo-domain/src",
-      "projectType": "library",
-      "architect": {
-        "lint": {
-          "builder": "@nrwl/linter:eslint",
-          "outputs": [
-            "{options.outputFile}"
-          ],
-          "options": {
-            "lintFilePatterns": [
-              "libs/todo/todo-domain/**/*.ts"
-            ]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "outputs": [
-            "coverage/libs/todo/todo-domain"
-          ],
-          "options": {
-            "jestConfig": "libs/todo/todo-domain/jest.config.js",
-            "passWithNoTests": true
-          }
-        }
-      },
-      "tags": []
-    },
     "todo-web": {
       "projectType": "library",
       "root": "libs/todo-web",

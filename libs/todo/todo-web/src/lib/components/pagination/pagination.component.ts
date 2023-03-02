@@ -3,8 +3,9 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { TodoWebService } from '../../services/todo-web.service';
-import { Status, Todo } from '../../../../.././../apps/nest-api/src/entity/Todo'
+// import { Todo.Status, Todo } from '../../../../.././../apps/nest-api/src/entity/Todo'
 import { Observable } from 'rxjs';
+import { Todo } from '@workspace/todo-domain';
 
 export interface UserData {
   id: string;
@@ -53,25 +54,24 @@ const NAMES: string[] = [
 })
 export class PaginationComponent implements AfterViewInit, OnInit {
   displayedColumns: string[] = ['name', 'description'];
-  dataSource!: MatTableDataSource<Todo>;
+  dataSource!: MatTableDataSource<Todo.TodoDto>;
   resultsLength?: number;
-  pendingList:Todo[] = [];
+  pendingList:Todo.TodoDto[] = [];
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-  // @ViewChild(MatSort) sort!: MatSort;
 
   constructor(readonly todoServices: TodoWebService) {
     // Create 100 users
     const users = Array.from({ length: 100 }, (_, k) => createNewUser(k + 1));
     //console.log(users);
-    // let pendingTodoRes = this.todoServices.getPendingTodos1(Status.PENDING);
+    // let pendingTodoRes = this.todoServices.getPendingTodos1(Todo.Status.PENDING);
   
    // console.log(pendingTodoRes);
    // console.log(this.pendingList);
     // Assign the data to the data source for the table to render
     // if ( this.pendingList.length )this.pendingTodoSource = new MatTableDataSource(this.pendingList);
    
-    this.todoServices.getPendingTodos1(Status.PENDING).subscribe(data =>  {
+    this.todoServices.getPendingTodos1(Todo.Status.PENDING).subscribe(data =>  {
       data? this.dataSource = new MatTableDataSource(data): console.log("data not present");
       // console.log("consloe for datasource ==", this.dataSource._pageData);
       this.resultsLength = data.length;
@@ -81,7 +81,7 @@ export class PaginationComponent implements AfterViewInit, OnInit {
   }
   ngOnInit(){
     
-    // this.todoServices.getPendingTodos1(Status.PENDING).subscribe(pendingList => {this.dataSource = new MatTableDataSource(pendingList), console.log("  ngoninit pendingList>>>",pendingList
+    // this.todoServices.getPendingTodos1(Todo.Status.PENDING).subscribe(pendingList => {this.dataSource = new MatTableDataSource(pendingList), console.log("  ngoninit pendingList>>>",pendingList
     // )});
 
     // this.dataSource  ? this.dataSource.paginator = this.paginator : console.log("data not available")
@@ -100,7 +100,7 @@ export class PaginationComponent implements AfterViewInit, OnInit {
      
    
     // this.dataSource = new MatTableDataSource(data1), 
-    this.dataSource  ? this.dataSource.paginator = this.paginator : console.log("data not available")
+    this.dataSource ? this.dataSource.paginator = this.paginator : console.log("data not available")
     // this.dataSource.sort = this.sort;
   }
 

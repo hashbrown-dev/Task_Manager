@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { TodoEntity, TodoModule } from '../../../../libs/todo/todo-api/src';
 
-// import { Todo } from '../entity/todo';
-import { Todo } from '../../../../libs/todo/todo-api/src/lib/entity/Todo';
 
 @Module({
   imports: [
-    
+    TodoModule,
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: '127.0.0.1',
@@ -15,7 +14,7 @@ import { Todo } from '../../../../libs/todo/todo-api/src/lib/entity/Todo';
       password: 'password',
       database: 'local',
       autoLoadEntities: true,
-      entities: [Todo],
+      entities: [TodoEntity],
       synchronize: true,
     })
   ],

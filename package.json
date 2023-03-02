@@ -29,6 +29,7 @@
     "@nrwl/angular": "^13.2.2",
     "@nrwl/schematics": "^8.12.11",
     "mysql": "npm:mysql2@^2.3.0",
+    "npx": "^10.2.2",
     "nx": "^13.2.3",
     "reflect-metadata": "^0.1.13",
     "rxjs": "~7.4.0",

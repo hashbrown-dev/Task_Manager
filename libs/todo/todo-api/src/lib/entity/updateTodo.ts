@@ -1,21 +1,22 @@
-import { Status, PRIORITY } from './Todo';
+import { Todo } from "@workspace/todo-domain";
+
 
 export class UpdateStatusEntity {
-  status!: Status;
+  status!: Todo.Status;
 }
 
 export class UpdateTaskEntity {
   name: string;
   description: string;
-  priority: PRIORITY;
+  priority: Todo.Priority;
   due_date: Date;
-  status!: Status;
+  status!: Todo.Status;
 
   constructor() {
     this.name = "";
     this.description = "";
-    this.priority = PRIORITY.LOW;
+    this.priority = Todo.Priority.LOW;
     this.due_date = new Date();
-    this.status = Status.PENDING;
+    this.status = Todo.Status.PENDING;
   }
 }

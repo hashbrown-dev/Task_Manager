@@ -1,11 +1,12 @@
+import { Todo } from "@workspace/todo-domain";
 
 
-export class PaginationDTOs {
+export class PaginationEntity {
 
     search: string;
     skip?: number;
     take?: number;
-    status?: TodoModel Status;
+    status?: Todo.Status;
     page?: number;
 
     constructor() {
@@ -13,6 +14,6 @@ export class PaginationDTOs {
         this.take=10,
         this.skip=0,
         this.page=1, 
-        this.status=Status.PENDING;  
+        this.status=Todo.Status.PENDING;  
     }
 }

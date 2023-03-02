@@ -8,8 +8,10 @@ import { MatTableDataSource } from '@angular/material/table';
 import {ThemePalette} from '@angular/material/core';
 
 import { TodoWebService } from '../../services/todo-web.service';
-import { Status, Todo } from "../../../../../../apps/nest-api/src/entity/Todo";
-import { PaginationDTO } from "../../../../../../apps/nest-api/src/entity/paginationDTO";
+// import { Todo.Status, Todo } from "../../../../../../apps/nest-api/src/entity/Todo";
+// import { PaginationDTO } from "../../../../../../apps/nest-api/src/entity/paginationDTO";
+import { UpdateTaskDialog } from '../../dialogs';
+import { Todo } from '@workspace/todo-domain';
 
 @Component({
   selector: 'workspace-list',
@@ -21,7 +23,7 @@ export class ListComponent implements AfterViewInit {
 
   displayedPendingColumns: string[] = ['id', 'name', 'priority', 'due_date', 'detais'];
   displayedCompletedColumns: string[] = ['name', 'priority', 'due_date', 'detais'];
-  dataSource!: MatTableDataSource<Todo[]>;
+  dataSource!: MatTableDataSource<Todo.TodoDto[]>;
   refresh$ = new BehaviorSubject(null);
   resultsLengthPD = 0;
   resultsLengthCM = 0;
@@ -31,11 +33,11 @@ export class ListComponent implements AfterViewInit {
 
   isTableVisible = false;
   
-  paginationParametersPD = new PaginationDTO();
-  paginationBehaviorObjectPD$ = new BehaviorSubject<PaginationDTO>(new PaginationDTO());
+  paginationParametersPD!: Todo.PaginationDto;
+  paginationBehaviorObjectPD$ = new BehaviorSubject<Todo.PaginationDto | null>(null);
 
-  paginationParametersCM = new PaginationDTO();
-  paginationBehaviorObjectCM$ = new BehaviorSubject<PaginationDTO>(new PaginationDTO());
+  paginationParametersCM!: Todo.PaginationDto;
+  paginationBehaviorObjectCM$ = new BehaviorSubject<Todo.PaginationDto | null>(null);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -54,7 +56,7 @@ export class ListComponent implements AfterViewInit {
   
   // todosPending$ = this.paginationBehaviorObjectPD$.pipe(
   //   switchMap(async (paginationParameters) => {
-  //     paginationParameters.status = Status.PENDING;
+  //     paginationParameters.status = Todo.Status.PENDING;
   //     this.paginationParametersPD = paginationParameters;
   //     console.log(this.paginationParametersPD);
   //     const res = await this.todoServices.queryTodoParams(paginationParameters);
@@ -65,11 +67,11 @@ export class ListComponent implements AfterViewInit {
   // );
 
   todosPending$ = combineLatest([this.paginationBehaviorObjectPD$, this.refresh$]).pipe(
-    switchMap(async ([paginationParameters]) => {
-      paginationParameters.status = Status.PENDING;
-      this.paginationParametersPD = paginationParameters;
-      console.log(this.paginationParametersPD);
-      const res = await this.todoServices.queryTodoParams(paginationParameters);
+    switchMap(async ([paginationParameters, refresh]) => {
+      // paginationParameters!.status = Todo.Status.PENDING;
+      // this.paginationParametersPD = paginationParameters!;
+      // console.log(this.paginationParametersPD);
+      const res = await this.todoServices.queryTodoParams(paginationParameters!);
       return res;
     }),
     tap((data) => (this.resultsLengthPD = data[1])),
@@ -79,10 +81,10 @@ export class ListComponent implements AfterViewInit {
 
   todosCompleted$ = combineLatest([this.paginationBehaviorObjectCM$, this.refresh$]).pipe(
     switchMap(async ([paginationParameters]) => {
-      paginationParameters.status = Status.COMPLETED;
-      this.paginationParametersCM = paginationParameters;
+      paginationParameters!.status = Todo.Status.COMPLETED;
+      this.paginationParametersCM = paginationParameters!;
       console.log(this.paginationParametersCM);
-      const res = await this.todoServices.queryTodoParams(paginationParameters);
+      const res = await this.todoServices.queryTodoParams(paginationParameters!);
       return res;
     }),
     
@@ -94,14 +96,14 @@ export class ListComponent implements AfterViewInit {
     this.isLoadingResultsPD = true;
     this.isLoadingResultsCM = true;
 
-    this.paginationParametersPD.status = Status.PENDING;
+    this.paginationParametersPD.status = Todo.Status.PENDING;
     this.paginationParametersPD.search = searchTodoInput.target.value.trim().toLowerCase();
     console.log(this.paginationParametersPD);
     this.paginationBehaviorObjectPD$.next(this.paginationParametersPD);
     this.isLoadingResultsPD = false;
     // this.paginator.firstPage();
 
-    this.paginationParametersCM.status = Status.COMPLETED;
+    this.paginationParametersCM.status = Todo.Status.COMPLETED;
     this.paginationParametersCM.search = searchTodoInput.target.value.trim().toLowerCase();
     console.log(this.paginationParametersCM);
     this.paginationBehaviorObjectCM$.next(this.paginationParametersCM);
@@ -119,14 +121,14 @@ export class ListComponent implements AfterViewInit {
 
   todoPending$ = this.refresh$.pipe(switchMap(() => {
     this.isLoadingResultsPD = true;
-    let pendingTodo = this.todoServices.getPendingTodos(Status.PENDING);
+    let pendingTodo = this.todoServices.getPendingTodos(Todo.Status.PENDING);
     this.isLoadingResultsPD = false;
     return pendingTodo;
   }));
 
   todoCompleted$ = this.refresh$.pipe(switchMap(() => {
     this.isLoadingResultsCM = true;
-    let completedTodo = this.todoServices.getCompletedTodos(Status.COMPLETED);
+    let completedTodo = this.todoServices.getCompletedTodos(Todo.Status.COMPLETED);
     this.isLoadingResultsCM = false;
     return completedTodo;
   }));
@@ -142,8 +144,8 @@ export class ListComponent implements AfterViewInit {
   // }
 
 
-  updateTaskDialog(todo: Todo): void {
-    const dialogRef = this.dialog.open(UpdateTaskDialogComponent, {
+  updateTaskDialog(todo: Todo.TodoDto): void {
+    const dialogRef = this.dialog.open(UpdateTaskDialog, {
       width: '350px',
       data: todo
     });
@@ -157,16 +159,16 @@ export class ListComponent implements AfterViewInit {
     });
   }
 
-  async markAsDone(id: number) {
+  async markAsDone(id: string) {
     this.isLoadingResultsPD = true;
     this.isLoadingResultsCM = true;
-    await this.todoServices.markAsDone(id, { status: Status.COMPLETED});
+    await this.todoServices.markAsDone(id, { status: Todo.Status.COMPLETED});
     this.refresh$.next(null);
     this.isLoadingResultsPD = false;
     this.isLoadingResultsCM = false;
   }
 
-  async deleteTask(id: number) {
+  async deleteTask(id: string) {
     await this.todoServices.deleteTodo(id);
     this.refresh$.next(null);
   }

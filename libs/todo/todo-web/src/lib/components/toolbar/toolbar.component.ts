@@ -2,9 +2,7 @@ import { Component, OnInit, Inject, Output, EventEmitter } from '@angular/core';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
 import { BehaviorSubject, map, switchMap } from 'rxjs';
-
-import { Todo, PRIORITY } from "../../../../../../apps/nest-api/src/entity/Todo";
-import { AddTaskDialogComponent } from "../../dialogs/dialogs.component";
+import { AddTaskDialog } from '../../dialogs';
 
 @Component({
   selector: 'workspace-toolbar',
@@ -20,7 +18,7 @@ export class ToolbarComponent {
 
 
   openDialog(): void {
-    const dialogRef = this.dialog.open(AddTaskDialogComponent, {
+    const dialogRef = this.dialog.open(AddTaskDialog, {
       width: '350px',
     });
 

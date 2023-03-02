@@ -8,14 +8,14 @@
   </div>
   
   <div mat-dialog-content>
-    <form [formGroup]="addForm">
+    <form [formGroup]="form">
       <mat-form-field appearance="fill" floatLabel="auto">
         <mat-label>Task Name</mat-label>
         <input
           matInput
           placeholder="Provide a meaningful title"
           required
-          formControlName="name"
+          formControlName="title"
         />
       </mat-form-field>
   
@@ -30,7 +30,7 @@
   
       <mat-form-field class="input-bottom-spacing-2" appearance="fill">
         <mat-label>Due Date</mat-label>
-        <input matInput [matDatepicker]="picker" formControlName="dueDate" />
+        <input matInput [matDatepicker]="picker" formControlName="due_date" />
         <mat-hint>MM/DD/YYYY</mat-hint>
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
@@ -38,7 +38,7 @@
   
       <mat-form-field>
         <mat-label>Priority Level</mat-label>
-        <mat-select required formControlName="priority">
+        <mat-select required formControlName="priority" [value]="priorities[0]">
           <mat-option *ngFor="let priority of priorities" [value]="priority">
             {{ priority }}
           </mat-option>
@@ -57,7 +57,7 @@
           color="primary"
           cdkFocusInitial
           type="submit"
-          [disabled]="addForm.invalid"
+          [disabled]="form.invalid"
           (click)="createNewTodo()">
           Create
         </button>

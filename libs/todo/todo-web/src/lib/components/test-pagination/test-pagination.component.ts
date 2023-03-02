@@ -3,9 +3,10 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { TodoWebService } from '../../services/todo-web.service';
-import { Status, Todo } from '../../../../.././../apps/nest-api/src/entity/Todo';
-import { PaginationDTO } from "../../../../../../apps/nest-api/src/entity/paginationDTO";
+// import { Status, Todo } from '../../../../.././../apps/nest-api/src/entity/Todo';
+// import { PaginationDTO } from "../../../../../../apps/nest-api/src/entity/paginationDTO";
 import { Observable, BehaviorSubject, map, switchMap, tap } from "rxjs";
+import { Todo } from '@workspace/todo-domain';
 
 @Component({
   selector: 'workspace-test-pagination',
@@ -19,8 +20,8 @@ export class TestPaginationComponent {
   displayedColumns = ["name", "description"];
   checked = false;
 
-  paginationParameters = new PaginationDTO();
-  paginationBehaviorObject$ = new BehaviorSubject<PaginationDTO>(new PaginationDTO());
+  paginationParameters!: Todo.PaginationDto;
+  paginationBehaviorObject$ = new BehaviorSubject<Todo.PaginationDto | null>(null);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -30,9 +31,9 @@ export class TestPaginationComponent {
 
   todos$ = this.paginationBehaviorObject$.pipe(
     switchMap(async (paginationParameters) => {
-      this.paginationParameters = paginationParameters;
+      this.paginationParameters = paginationParameters!;
       console.log(this.paginationParameters);
-      const res = await this.todoServices.queryTodoParams(paginationParameters);
+      const res = await this.todoServices.queryTodoParams(paginationParameters!);
       return res;
     }),
     

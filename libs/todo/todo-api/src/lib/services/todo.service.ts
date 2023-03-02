@@ -1,22 +1,19 @@
 import { Inject } from '@angular/core';
 import { Injectable, HttpException } from '@nestjs/common';
 import { getManager } from 'typeorm';
-
-import { Todo, Status } from "../../../../../apps/nest-api/src/entity/Todo";
-import { createTodo } from 'apps/nest-api/src/entity/createTodo';
-import { UpdateStatusEntity, UpdateTaskEntity } from "../../../../../apps/nest-api/src/entity/updateTodo";
-import { PaginationDTO } from 'apps/nest-api/src/entity/paginationDTO';
-import { skip, take } from 'rxjs';
+// import { skip, take } from 'rxjs';
+import { Todo } from '@workspace/todo-domain';
+import { TodoEntity } from '../entity';
 
 @Injectable()
 export class TodoService {
 
-    private todo!: Todo[];
+    private todo!: Todo.TodoDto[];
 
     constructor(){}
 
-    async getAllTodos(): Promise<Todo[]> {
-        this.todo = await Todo.find();
+    async getAllTodos(): Promise<Todo.TodoDto[]> {
+        this.todo = await TodoEntity.find();
         return this.todo;
       }
 
@@ -28,20 +25,20 @@ export class TodoService {
       //   return this.todo;
       // }
 
-    async getTodoById(id: number): Promise<Todo | undefined> {
-      return await Todo.findOne(id);
+    async getTodoById(id: string): Promise<Todo.TodoDto | undefined> {
+      return await TodoEntity.findOne(id);
     }
 
-    async getPendingTodos(status: string): Promise<Todo[]> {
-      const todo = await Todo.find({
+    async getPendingTodos(status: Todo.Status): Promise<Todo.TodoDto[]> {
+      const todo = await TodoEntity.find({
         where: { status: status},
        take: 7
       });
       return todo;
     }
     
-    async getCompletedTodos(status: string): Promise<Todo[]> {
-      const todo = await Todo.find({
+    async getCompletedTodos(status: string): Promise<Todo.TodoDto[]> {
+      const todo = await TodoEntity.find({
         where: { status: status},
         take: 7
       });
@@ -49,14 +46,14 @@ export class TodoService {
       return todo;
     }
 
-    async createTodo(todo: Todo): Promise<Todo> {
-      return await Todo.save(todo);
+    async createTodo(todo: TodoEntity): Promise<any> {
+      return await TodoEntity.save(todo);
     }
 
-    async queryTodoParams(paginator: PaginationDTO): Promise<[Todo[], number]> {
+    async queryTodoParams(paginator: Todo.PaginationDto): Promise<[Todo.TodoDto[], number]> {
       console.log("Inside the backend service method");
       
-      let query = Todo.createQueryBuilder().select("todo").from(Todo, "todo").where(`todo.status = '${paginator.status}'`).andWhere('todo.name LIKE :search',{search: `%${paginator.search}%`});
+      let query = TodoEntity.createQueryBuilder().select("todo").from(TodoEntity, "todo").where(`todo.status = '${paginator.status}'`).andWhere('todo.name LIKE :search',{search: `%${paginator.search}%`});
       
       // query = await query.select();
       // query =query.where("todo.status = '${paginator.status}'");
@@ -94,8 +91,8 @@ export class TodoService {
       return todos;
     }
 
-    async updateTodo(id: number, payload: UpdateTaskEntity): Promise<Todo | undefined> {
-      const todo = await Todo.findOne(id);
+    async updateTodo(id: string, payload: Todo.UpdateTodoDto): Promise<Todo.UpdateTodoDto | undefined> {
+      const todo = await TodoEntity.findOne(id);
       if (todo === undefined) {
         throw new HttpException(
           "The task was not found in the database!",
@@ -103,22 +100,21 @@ export class TodoService {
         );
       }
       try {
-        todo.name = payload.name;
+        todo.title = payload.title;
         todo.description = payload.description;
         todo.status = payload.status;
         todo.due_date = new Date(payload.due_date);
         todo.updated_date = new Date();
         todo.priority =payload.priority;
-        const updatedTodo: Todo = await Todo.save(todo);
-        return updatedTodo;
+        return await TodoEntity.save(todo);
       } 
       catch (error) {
         throw new HttpException(`Sorry! An error occurred: ${error}`, 1000);
       }
     }
 
-    async markAsDone(id: number, payload: UpdateStatusEntity): Promise<Todo> {
-      const todo = await Todo.findOne(id);
+    async markAsDone(id: string, payload: Todo.UpdateStatusDto): Promise<Todo.TodoDto> {
+      const todo = await TodoEntity.findOne(id);
       if (todo === undefined) {
         throw new HttpException(
           "The task was not found in the database!",
@@ -128,16 +124,15 @@ export class TodoService {
       try {
         todo.status = payload.status;
         todo.updated_date = new Date();
-        const updatedTodo: Todo = await Todo.save(todo);
-        return updatedTodo;
+        return await TodoEntity.save(todo);
       } 
       catch (error) {
         throw new HttpException(`Sorry! An error occurred: ${error}`, 1000);
       }
     }
 
-    deleteTodoById(id: number): void {
-      Todo.delete(id)
+    deleteTodoById(id: string): void {
+      TodoEntity.delete(id)
     }
 
 }

@@ -1,11 +1,11 @@
-import { Status, PRIORITY } from './Todo';
+import { Todo } from "@workspace/todo-domain"
 
 export class createTodo {
     
   name!: string
   description!: string
-  status!: Status
-  priority!: PRIORITY
+  status!: Todo.Status
+  priority!: Todo.Priority
   due_date!: Date
 
   // constructor() {

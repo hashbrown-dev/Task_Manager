@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+// import { HttpClient } from '@angular/common/http';
 import { firstValueFrom, Observable, pipe } from 'rxjs';
 import { Body } from '@nestjs/common';
 import { map } from 'rxjs/operators';
 
 import { Todo } from '@workspace/todo-domain'
+import { HttpClient } from '@angular/common/http';
 // import { Todo.Status, Todo } from '../../../../../apps/nest-api/src/entity/Todo';
 // import { createTodo } from '../../../../../apps/nest-api/src/entity/createTodo';
 // import { UpdateStatusEntity, UpdateTaskEntity } from '../../../../../apps/nest-api/src/entity/updateTodo';
@@ -41,20 +42,20 @@ export class TodoWebService {
     return todos;
   }
 
-  public getTodoByID(id: number): Observable<Todo.TodoDto> {
+  public getTodoByID(id: string): Observable<Todo.TodoDto> {
     const todo = this.http.get<Todo.TodoDto>(this.BaseURL + `/todo/getTodoById/${id}`, {
       headers: { "Access-Control-Allow-Origin": "*" },
     });
     return todo;
   }
 
-  createTodo(payload: Todo.CreateTodoDto): Observable<Todo.TodoDto> {
+  createTodo(payload: Todo.TodoDto): Observable<Todo.TodoDto> {
     const todo = this.http.post<Todo.TodoDto>(this.BaseURL + `/todo/createTodo`, payload);
     todo.subscribe();
     return todo;
   }
 
-  async updateTodo(id: number, payload: Todo.UpdateTodoDto): Promise<void> {
+  async updateTodo(id: string, payload: Todo.UpdateTodoDto): Promise<void> {
     // if (payload.Todo.Status != "Completed") {
     //   payload.updated_date = new Date(0);
     // }
@@ -62,15 +63,15 @@ export class TodoWebService {
     await firstValueFrom(todo);
   }
 
-  async markAsDone(id: number, payload: Todo.UpdateStatusDto) {
+  async markAsDone(id: string, payload: Todo.UpdateStatusDto) {
     return await firstValueFrom(this.http.put(this.BaseURL + `/todo/markAsDone/${id}`, payload));
   }
 
-  async deleteTodo(id: number) {
+  async deleteTodo(id: string) {
     return await firstValueFrom(this.http.delete(this.BaseURL + `/todo/removeTodo/${id}`));
   }
 
-  async queryTodoParams(queryParams: Todo.TodoDto): Promise<[Todo.TodoDto[], number]> {
+  async queryTodoParams(queryParams: Todo.PaginationDto): Promise<[Todo.TodoDto[], number]> {
     console.log("Query P in web-services", queryParams);
     const todos = await firstValueFrom(
       this.http.post<[Todo.TodoDto[], number]>(this.BaseURL + `/todo/queryTodoParams`, queryParams, 
